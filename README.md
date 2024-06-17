@@ -1,4 +1,4 @@
-# News Research Tool 📈
+# News Research Chatbot 📈
 
 This is a Streamlit-based news research chatbot that utilizes large language models (LLMs) to answer questions based on news articles. The project uses the LangChain framework to process and handle news articles, create embeddings, and retrieve relevant information to answer user queries.
 
