@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import time
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import UnstructuredURLLoader
@@ -11,7 +11,7 @@ from langchain.vectorstores import FAISS
 from dotenv import load_dotenv
 load_dotenv() # take environment variables from .env (especially openai api key)
 
-st.title("News Research Tool 📈")
+st.title("News Research Chatbot 📈")
 st.sidebar.title("News Article URLs")
 
 urls = []
@@ -20,11 +20,11 @@ for i in range(2):
     urls.append(url)
 
 process_url_clicked = st.sidebar.button("Process URLs")
-#file_path = "faiss_index_store"
+
 index_dir = "faiss_index_dir"
 
 main_placeholder = st.empty()
-llm_call = OpenAI(model="davinci-002", temperature=0.7, max_tokens=100)
+llm_call = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7, max_tokens=500)
 
 if process_url_clicked:
     # load data
@@ -47,9 +47,6 @@ if process_url_clicked:
     main_placeholder.text("Embedding Vector Started Building...✅✅✅")
     time.sleep(2)
 
-    # Save the FAISS index to a pickle file
-    #vecidx_store.save_local(file_path)
-
     # Save the FAISS index to a directory
     os.makedirs(index_dir, exist_ok=True)
     vecidx_store.save_local(index_dir)
@@ -58,7 +55,6 @@ query = main_placeholder.text_input("Question: ")
 
 if query:
     if os.path.exists(index_dir):
-        #with open(file_path, "rb") as f:
         embeddings = OpenAIEmbeddings()
         loaded_vecidx = FAISS.load_local(index_dir, embeddings)
         chain = RetrievalQAWithSourcesChain.from_llm(llm=llm_call, retriever=loaded_vecidx.as_retriever())
@@ -71,7 +67,6 @@ if query:
         sources = result.get("sources", "")
         if sources:
             st.subheader("Sources:")
-            sources_list = sources.split("\n")  # Split the sources by newline
+            sources_list = sources.split("\n")
             for source in sources_list:
                 st.write(source)
-
