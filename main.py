@@ -56,7 +56,7 @@ query = main_placeholder.text_input("Question: ")
 if query:
     if os.path.exists(index_dir):
         embeddings = OpenAIEmbeddings()
-        loaded_vecidx = FAISS.load_local(index_dir, embeddings)
+        loaded_vecidx = FAISS.load_local(index_dir, embeddings, allow_dangerous_deserialization=True)
         chain = RetrievalQAWithSourcesChain.from_llm(llm=llm_call, retriever=loaded_vecidx.as_retriever())
         result = chain({"question": query}, return_only_outputs=True)
         # result will be a dictionary of this format --> {"answer": "", "sources": [] }
