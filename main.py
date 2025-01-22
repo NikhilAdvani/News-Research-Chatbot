@@ -11,15 +11,15 @@ import nltk
 from dotenv import load_dotenv
 load_dotenv() # take environment variables from .env (especially openai api key)
 
-# try:
-#     nltk.download('punkt_tab')
-#     nltk.download('punkt')
-#     nltk.download('averaged_perceptron_tagger')
-#     nltk.download('universal_tagset')
-#     nltk.download('popular')  # Downloads most popular packages
-#     nltk.download('averaged_perceptron_tagger_eng')
-# except Exception as e:
-#     st.warning(f"NLTK Download Error: {str(e)}")
+try:
+    nltk.download('punkt_tab')
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('universal_tagset')
+    nltk.download('popular')  # Downloads most popular packages
+    nltk.download('averaged_perceptron_tagger_eng')
+except Exception as e:
+    st.warning(f"NLTK Download Error: {str(e)}")
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
