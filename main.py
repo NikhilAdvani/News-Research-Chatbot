@@ -29,29 +29,77 @@ main_placeholder = st.empty()
 llm_call = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7, max_tokens=500)
 
 if process_url_clicked:
-    # load data
-    loader = UnstructuredURLLoader(urls=urls)
-    main_placeholder.text("Data Loading...Started...✅✅✅")
-    data = loader.load()
+    # Validate URLs
+    valid_urls = [url for url in urls if url.strip()]  # Remove empty URLs
+    
+    if not valid_urls:
+        st.error("Please enter at least one valid URL")
+    else:
+        try:
+            # load data
+            loader = UnstructuredURLLoader(urls=valid_urls)
+            main_placeholder.text("Data Loading...Started...✅✅✅")
+            data = loader.load()
+            
+            if not data:
+                st.error("Could not fetch content from the provided URLs")
+                st.stop()
 
-    # split data
-    text_splitter = RecursiveCharacterTextSplitter(
-        separators=['\n\n', '\n', '.', ','],
-        chunk_size=1000
-    )
+            # split data
+            text_splitter = RecursiveCharacterTextSplitter(
+                separators=['\n\n', '\n', '.', ','],
+                chunk_size=1000
+            )
 
-    main_placeholder.text("Text Splitter...Started...✅✅✅")
-    docs = text_splitter.split_documents(data)
+            main_placeholder.text("Text Splitter...Started...✅✅✅")
+            docs = text_splitter.split_documents(data)
+            
+            if not docs:
+                st.error("No valid text content found to process")
+                st.stop()
 
-    # create embeddings and save it to FAISS index
-    embeddings = OpenAIEmbeddings()
-    vecidx_store = FAISS.from_documents(docs, embeddings)
-    main_placeholder.text("Embedding Vector Started Building...✅✅✅")
-    time.sleep(2)
+            # create embeddings and save it to FAISS index
+            embeddings = OpenAIEmbeddings()
+            try:
+                vecidx_store = FAISS.from_documents(docs, embeddings)
+                main_placeholder.text("Embedding Vector Started Building...✅✅✅")
+                time.sleep(2)
 
-    # Save the FAISS index to a directory
-    os.makedirs(index_dir, exist_ok=True)
-    vecidx_store.save_local(index_dir)
+                # Save the FAISS index to a directory
+                os.makedirs(index_dir, exist_ok=True)
+                vecidx_store.save_local(index_dir)
+            except Exception as e:
+                st.error(f"Error creating embeddings: {str(e)}")
+                st.stop()
+                
+        except Exception as e:
+            st.error(f"Error processing URLs: {str(e)}")
+            st.stop()
+
+# if process_url_clicked:
+#     # load data
+#     loader = UnstructuredURLLoader(urls=urls)
+#     main_placeholder.text("Data Loading...Started...✅✅✅")
+#     data = loader.load()
+
+#     # split data
+#     text_splitter = RecursiveCharacterTextSplitter(
+#         separators=['\n\n', '\n', '.', ','],
+#         chunk_size=1000
+#     )
+
+#     main_placeholder.text("Text Splitter...Started...✅✅✅")
+#     docs = text_splitter.split_documents(data)
+
+#     # create embeddings and save it to FAISS index
+#     embeddings = OpenAIEmbeddings()
+#     vecidx_store = FAISS.from_documents(docs, embeddings)
+#     main_placeholder.text("Embedding Vector Started Building...✅✅✅")
+#     time.sleep(2)
+
+#     # Save the FAISS index to a directory
+#     os.makedirs(index_dir, exist_ok=True)
+#     vecidx_store.save_local(index_dir)
 
 query = main_placeholder.text_input("Question: ")
 
