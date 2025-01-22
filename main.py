@@ -7,9 +7,16 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
-
+import nltk
 from dotenv import load_dotenv
 load_dotenv() # take environment variables from .env (especially openai api key)
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('universal_tagset')
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
