@@ -17,6 +17,7 @@ try:
     nltk.download('averaged_perceptron_tagger')
     nltk.download('universal_tagset')
     nltk.download('popular')  # Downloads most popular packages
+    nltk.download('averaged_perceptron_tagger_eng')
 except Exception as e:
     st.warning(f"NLTK Download Error: {str(e)}")
 
